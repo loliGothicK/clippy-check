@@ -16,9 +16,9 @@ clippy:
         - uses: LoliGothick/clippy-check@master
           with:
               token: ${{ secrets.GITHUB_TOKEN }}
-              allow:
-                - nonstandard_macro_braces
-                - incomplete_features
+              allow: >
+                nonstandard_macro_braces
+                incomplete_features
               deny: warnings  
 ```
 

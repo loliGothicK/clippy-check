@@ -7688,15 +7688,11 @@ var string_argv = __nccwpck_require__(9453);
 function get() {
     const token = core.getInput('token', { required: true });
     const options = (0,string_argv/* default */.ZP)(core.getInput('options', { required: false }));
-    const warn = core.getMultilineInput('warn', { required: false });
-    const allow = core.getMultilineInput('allow', { required: false });
-    const deny = core.getMultilineInput('deny', { required: false });
-    const forbid = core.getMultilineInput('forbid', { required: false });
+    const warn = (0,string_argv/* default */.ZP)(core.getInput('warn', { required: false }));
+    const allow = (0,string_argv/* default */.ZP)(core.getInput('allow', { required: false }));
+    const deny = (0,string_argv/* default */.ZP)(core.getInput('deny', { required: false }));
+    const forbid = (0,string_argv/* default */.ZP)(core.getInput('forbid', { required: false }));
     const name = core.getInput('name', { required: false });
-    core.setOutput('warn', `${warn}`);
-    core.setOutput('allow', `${allow}`);
-    core.setOutput('deny', `${deny}`);
-    core.setOutput('forbid', `${forbid}`);
     return {
         token,
         options,
