@@ -23,7 +23,7 @@ export async function run(actionInput: input.Input): Promise<Result<void, string
 
     let rustcVersion = await version('rustc');
     let cargoVersion = await version('cargo');
-    let clippyVersion = await version('clippy');
+    let clippyVersion = await version('cargo', ['clippy']);
 
     const warn = prefix('--warn', actionInput.warn);
     const allow = prefix('--allow', actionInput.allow);

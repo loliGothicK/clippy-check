@@ -8064,7 +8064,7 @@ async function run(actionInput) {
     const startedAt = new Date().toISOString();
     let rustcVersion = await version('rustc');
     let cargoVersion = await version('cargo');
-    let clippyVersion = await version('clippy');
+    let clippyVersion = await version('cargo', ['clippy']);
     const warn = prefix('--warn', actionInput.warn);
     const allow = prefix('--allow', actionInput.allow);
     const deny = prefix('--deny', actionInput.deny);
