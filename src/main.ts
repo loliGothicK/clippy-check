@@ -55,6 +55,10 @@ export async function run(actionInput: input.Input): Promise<Result<void, string
     }
 
     let sha = github.context.sha;
+    const pr = github.context.payload.pull_request;
+    if (pr !== undefined && 'head' in pr) {
+        sha = pr.head.sha;
+    }
     await runner.executeCheck({
         token: actionInput.token,
         name: actionInput.name,
@@ -76,6 +80,7 @@ export async function run(actionInput: input.Input): Promise<Result<void, string
                 .map(line => line.startsWith('error: internal compiler error'))
                 .reduce((acc, ice) => acc || ice, false)
         ) {
+            core.setOutput('Suppress ICEs', stdErr);
             return new Ok(undefined);
         }
         return new Err(`Clippy had exited with the ${clippyExitCode} exit code:\n${stdErr}`);
