@@ -55,9 +55,6 @@ export async function run(actionInput: input.Input): Promise<Result<void, string
     }
 
     let sha = github.context.sha;
-    if (github.context.payload.pull_request?.head?.sha) {
-        sha = github.context.payload.pull_request.head.sha;
-    }
     await runner.executeCheck({
         token: actionInput.token,
         name: actionInput.name,

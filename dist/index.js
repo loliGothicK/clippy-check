@@ -8090,9 +8090,6 @@ async function run(actionInput) {
         core.endGroup();
     }
     let sha = github.context.sha;
-    if (github.context.payload.pull_request.head.sha) {
-        sha = github.context.payload.pull_request.head.sha;
-    }
     await runner.executeCheck({
         token: actionInput.token,
         name: actionInput.name,
