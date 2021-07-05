@@ -1,0 +1,33 @@
+name: 'clippy-check'
+description: 'Run clippy and annotate the diff with errors and warnings'
+author: 'Mitama Lab'
+branding:
+    icon: play-circle
+    color: blue
+
+inputs:
+    token:
+        description: GitHub token
+        required: true
+    options:
+        description: Arguments for the `cargo clippy` command
+        required: false
+    warn:
+        description: Sequence of lint warnings (without `clippy::` prefix)
+        required: false
+    allow:
+        description: Sequence of lint allowed (without `clippy::` prefix)
+        required: false
+    deny:
+        description: Sequence of lint denied (without `clippy::` prefix)
+        required: false
+    forbid:
+        description: Sequence of lint forbidden (without `clippy::` prefix)
+        required: false
+    name:
+        description: Display name of the created GitHub check. Must be unique across several LoliGothick/clippy-check invocations.
+        default: clippy
+
+runs:
+    using: 'node12'
+    main: 'dist/index.js'
