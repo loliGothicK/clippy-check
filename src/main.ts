@@ -37,7 +37,16 @@ export async function run(actionInput: input.Input): Promise<Result<void, string
         core.startGroup('Executing cargo fmt (JSON output)');
         const execOutput = await exec.getExecOutput(
             'cargo',
-            ['clippy', ...actionInput.options, '--', ...warn, ...allow, ...deny, ...forbid],
+            [
+                'clippy',
+                '--message=format=json',
+                ...actionInput.options.filter(opt => !opt.startsWith('--message-format')),
+                '--',
+                ...warn,
+                ...allow,
+                ...deny,
+                ...forbid,
+            ],
             {
                 ignoreReturnCode: true,
                 failOnStdErr: false,

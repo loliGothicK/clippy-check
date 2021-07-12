@@ -8074,7 +8074,16 @@ async function run(actionInput) {
     let clippyExitCode = 0;
     try {
         core.startGroup('Executing cargo fmt (JSON output)');
-        const execOutput = await exec.getExecOutput('cargo', ['clippy', ...actionInput.options, '--', ...warn, ...allow, ...deny, ...forbid], {
+        const execOutput = await exec.getExecOutput('cargo', [
+            'clippy',
+            '--message=format=json',
+            ...actionInput.options.filter(opt => !opt.startsWith('--message-format')),
+            '--',
+            ...warn,
+            ...allow,
+            ...deny,
+            ...forbid,
+        ], {
             ignoreReturnCode: true,
             failOnStdErr: false,
             listeners: {
