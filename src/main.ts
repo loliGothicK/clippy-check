@@ -39,7 +39,7 @@ export async function run(actionInput: input.Input): Promise<Result<void, string
             'cargo',
             [
                 'clippy',
-                '--message=format=json',
+                '--message-format=json',
                 ...actionInput.options.filter(opt => !opt.startsWith('--message-format')),
                 '--',
                 ...warn,
