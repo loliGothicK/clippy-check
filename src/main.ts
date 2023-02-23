@@ -6,31 +6,31 @@ import * as input from './input';
 import { CheckRunner } from './check';
 import { Err, Ok, Result } from './result';
 
-async function version(cmd: string, args?: string[]): Promise<string> {
+async function getVersion(cmd: string, args?: string[]): Promise<string> {
     args = args === undefined ? ['-V'] : [...args, '-V'];
     return (await exec.getExecOutput(cmd, args, { silent: true })).stdout;
 }
 
-function prefix(prefix: string, options: string[]): string[] {
+function addPrefix(prefix: string, options: string[]): string[] {
     return options.flatMap(opt => [
         prefix,
-        opt === 'warnings' ? opt : opt.startsWith('clippy::') ? opt : 'clippy::' + opt,
+        opt === 'warnings' ? opt : opt.startsWith('clippy::') ? opt : `clippy::${opt}`,
     ]);
 }
 
 export async function run(actionInput: input.Input): Promise<Result<void, string>> {
     const startedAt = new Date().toISOString();
 
-    let rustcVersion = await version('rustc');
-    let cargoVersion = await version('cargo');
-    let clippyVersion = await version('cargo', ['clippy']);
+    const rustcVersion = await getVersion('rustc');
+    const cargoVersion = await getVersion('cargo');
+    const clippyVersion = await getVersion('cargo', ['clippy']);
 
-    const warn = prefix('--warn', actionInput.warn);
-    const allow = prefix('--allow', actionInput.allow);
-    const deny = prefix('--deny', actionInput.deny);
-    const forbid = prefix('--forbid', actionInput.forbid);
+    const warn = addPrefix('--warn', actionInput.warn);
+    const allow = addPrefix('--allow', actionInput.allow);
+    const deny = addPrefix('--deny', actionInput.deny);
+    const forbid = addPrefix('--forbid', actionInput.forbid);
 
-    let runner = new CheckRunner();
+    const runner = new CheckRunner();
     let stdErr = '';
     let clippyExitCode = 0;
     try {

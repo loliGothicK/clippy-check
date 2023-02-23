@@ -1,8 +1,8 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-
-const pkg = require('../package.json');
 import { plural } from './render';
+
+import pkg from '../package.json';
 
 const USER_AGENT = `${pkg.name}/${pkg.version} (${pkg.bugs.url})`;
 
@@ -51,7 +51,7 @@ interface Stats {
 }
 
 export class CheckRunner {
-    private annotations: Array<ChecksCreateParamsOutputAnnotations>;
+    private annotations: ChecksCreateParamsOutputAnnotations[];
     private stats: Stats;
 
     constructor() {
@@ -65,7 +65,7 @@ export class CheckRunner {
         };
     }
 
-    public tryPush(line: string): void {
+    tryPush(line: string): void {
         let contents: CargoMessage;
         try {
             contents = JSON.parse(line);
@@ -74,7 +74,7 @@ export class CheckRunner {
             return;
         }
 
-        if (contents.reason != 'compiler-message') {
+        if (contents.reason !== 'compiler-message') {
             core.debug(`Unexpected reason field, ignoring it: ${contents.reason}`);
             return;
         }
@@ -107,7 +107,7 @@ export class CheckRunner {
         this.annotations.push(CheckRunner.makeAnnotation(contents));
     }
 
-    public async executeCheck(options: CheckOptions): Promise<void> {
+    async executeCheck(options: CheckOptions): Promise<void> {
         core.info(`Clippy results: \
 ${this.stats.ice} ICE, ${this.stats.error} errors, \
 ${this.stats.warning} warnings, ${this.stats.note} notes, \
@@ -136,7 +136,7 @@ See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
 
                 // So, if there were any errors, we are considering this output
                 // as failed, throwing an error will set a non-zero exit code later
-                if (this.getConclusion() == 'failure') {
+                if (this.getConclusion() === 'failure') {
                     throw new Error('Exiting due to clippy errors');
                 } else {
                     // Otherwise if there were no errors (and we do not care about warnings),
@@ -183,7 +183,7 @@ See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
         let annotations = this.getBucket();
         while (annotations.length > 0) {
             // Request data is mostly the same for create/update calls
-            let req: any = {
+            const req: any = {
                 owner: options.owner,
                 repo: options.repo,
                 name: options.name,
@@ -192,7 +192,7 @@ See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
                     title: options.name,
                     summary: this.getSummary(),
                     text: this.getText(options.context),
-                    annotations: annotations,
+                    annotations,
                 },
             };
 
@@ -225,7 +225,7 @@ See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
         checkRunId: number,
         options: CheckOptions,
     ): Promise<void> {
-        let req: any = {
+        const req: any = {
             owner: options.owner,
             repo: options.repo,
             name: options.name,
@@ -252,7 +252,7 @@ See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
         checkRunId: number,
         options: CheckOptions,
     ): Promise<void> {
-        let req: any = {
+        const req: any = {
             owner: options.owner,
             repo: options.repo,
             name: options.name,
@@ -273,15 +273,15 @@ See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
         return;
     }
 
-    private dumpToStdout() {
+    private dumpToStdout(): void {
         for (const annotation of this.annotations) {
             core.info(annotation.message);
         }
     }
 
-    private getBucket(): Array<ChecksCreateParamsOutputAnnotations> {
+    private getBucket(): ChecksCreateParamsOutputAnnotations[] {
         // TODO: Use slice or smth?
-        let annotations: Array<ChecksCreateParamsOutputAnnotations> = [];
+        const annotations: ChecksCreateParamsOutputAnnotations[] = [];
         while (annotations.length < 50) {
             const annotation = this.annotations.pop();
             if (annotation) {
@@ -297,7 +297,7 @@ See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
     }
 
     private getSummary(): string {
-        let blocks: string[] = [];
+        const blocks: string[] = [];
 
         if (this.stats.ice > 0) {
             blocks.push(`${this.stats.ice} internal compiler error${plural(this.stats.ice)}`);
@@ -344,11 +344,11 @@ See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
 
     private isSuccessCheck(): boolean {
         return (
-            this.stats.ice == 0 &&
-            this.stats.error == 0 &&
-            this.stats.warning == 0 &&
-            this.stats.note == 0 &&
-            this.stats.help == 0
+            this.stats.ice === 0 &&
+            this.stats.error === 0 &&
+            this.stats.warning === 0 &&
+            this.stats.note === 0 &&
+            this.stats.help === 0
         );
     }
 
@@ -357,7 +357,7 @@ See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
     /// https://developer.github.com/v3/checks/runs/#annotations-object
     static makeAnnotation(contents: CargoMessage): ChecksCreateParamsOutputAnnotations {
         const primarySpan: undefined | DiagnosticSpan = contents.message.spans.find(
-            span => span.is_primary == true,
+            span => span.is_primary === true,
         );
         // TODO: Handle it properly
         if (null == primarySpan) {
@@ -379,17 +379,17 @@ See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
                 break;
         }
 
-        let annotation: ChecksCreateParamsOutputAnnotations = {
+        const annotation: ChecksCreateParamsOutputAnnotations = {
             path: primarySpan.file_name,
             start_line: primarySpan.line_start,
             end_line: primarySpan.line_end,
-            annotation_level: annotation_level,
+            annotation_level,
             title: contents.message.message,
             message: contents.message.rendered,
         };
 
         // Omit these parameters if `start_line` and `end_line` have different values.
-        if (primarySpan.line_start == primarySpan.line_end) {
+        if (primarySpan.line_start === primarySpan.line_end) {
             annotation.start_column = primarySpan.column_start;
             annotation.end_column = primarySpan.column_end;
         }

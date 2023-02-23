@@ -30,13 +30,19 @@
   "devDependencies": {
     "@types/core-js": "2.5.5",
     "@types/node": "18.14.1",
-    "@typescript-eslint/eslint-plugin": "5.53.0",
+    "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "5.53.0",
     "@vercel/ncc": "0.36.1",
-    "eslint": "8.34.0",
+    "eslint": "^8.34.0",
     "eslint-config-prettier": "8.6.0",
+    "eslint-config-standard-with-typescript": "^34.0.0",
+    "eslint-plugin-github": "^4.6.1",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jest": "^27.2.1",
+    "eslint-plugin-n": "^15.6.1",
+    "eslint-plugin-promise": "^6.1.1",
     "prettier": "2.8.4",
-    "typescript": "4.9.5"
+    "typescript": "^4.9.5"
   },
   "dependencies": {
     "@actions/core": "^1.4.0",
