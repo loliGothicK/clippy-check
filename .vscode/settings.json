@@ -1,5 +1,7 @@
 {
     "cSpell.words": [
-        "clippy"
+        "clippy",
+        "indoc",
+        "rustc"
     ]
 }

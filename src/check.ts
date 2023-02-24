@@ -1,5 +1,6 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
+import { outdent as indoc } from 'outdent';
 import { plural } from './render';
 
 import pkg from '../package.json';
@@ -108,10 +109,12 @@ export class CheckRunner {
     }
 
     async executeCheck(options: CheckOptions): Promise<void> {
-        core.info(`Clippy results: \
-${this.stats.ice} ICE, ${this.stats.error} errors, \
-${this.stats.warning} warnings, ${this.stats.note} notes, \
-${this.stats.help} help`);
+        core.info(indoc`
+            Clippy results:
+            ${this.stats.ice} ICE, ${this.stats.error} errors,
+            ${this.stats.warning} warnings, ${this.stats.note} notes,
+            ${this.stats.help} help
+        `);
 
         // TODO: Retries
         // TODO: Throttling
@@ -127,9 +130,11 @@ ${this.stats.help} help`);
             if (process.env.GITHUB_HEAD_REF) {
                 core.error(`Unable to create clippy annotations! Reason: ${error}`);
                 core.warning('It seems that this Action is executed from the forked repository.');
-                core.warning(`GitHub Actions are not allowed to create Check annotations, \
-when executed for a forked repos. \
-See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
+                core.warning(indoc`
+                    GitHub Actions are not allowed to create Check annotations,
+                    when executed for a forked repos.
+                    See https://github.com/actions-rs/clippy-check/issues/2 for details.
+                `);
                 core.info('Posting clippy checks here instead.');
 
                 this.dumpToStdout();
@@ -319,19 +324,20 @@ See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
     }
 
     private getText(context: CheckOptions['context']): string {
-        return `## Results
-| Message level           | Amount                |
-| ----------------------- | --------------------- |
-| Internal compiler error | ${this.stats.ice}     |
-| Error                   | ${this.stats.error}   |
-| Warning                 | ${this.stats.warning} |
-| Note                    | ${this.stats.note}    |
-| Help                    | ${this.stats.help}    |
-## Versions
-* ${context.rustc}
-* ${context.cargo}
-* ${context.clippy}
-`;
+        return indoc`
+            ## Results
+            | Message level           | Amount                |
+            | ----------------------- | --------------------- |
+            | Internal compiler error | ${this.stats.ice}     |
+            | Error                   | ${this.stats.error}   |
+            | Warning                 | ${this.stats.warning} |
+            | Note                    | ${this.stats.note}    |
+            | Help                    | ${this.stats.help}    |
+            ## Versions
+            * ${context.rustc}
+            * ${context.cargo}
+            * ${context.clippy}
+        `;
     }
 
     private getConclusion(): string {
