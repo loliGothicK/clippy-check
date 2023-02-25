@@ -23,6 +23,10 @@ export class Ok<T, E> {
     map<U>(f: Transformer<T, U>): Ok<U, E> {
         return new Ok(f(this.value));
     }
+
+    map_err<U>(_: any): Ok<T, U> {
+        return new Ok(this.value);
+    }
 }
 
 export class Err<T, E> {
@@ -40,7 +44,7 @@ export class Err<T, E> {
     unwrap_err(): E {
         return this.value;
     }
-    expect(msg: (err: E) => string | string): never {
+    expect(msg: ((err: E) => string) | string): never {
         if (typeof msg === 'string') {
             throw Error(msg);
         } else {
@@ -49,5 +53,9 @@ export class Err<T, E> {
     }
     map<U>(_: any): Err<U, E> {
         return new Err(this.value);
+    }
+
+    map_err<U>(f: Transformer<E, U>): Err<T, U> {
+        return new Err(f(this.value));
     }
 }

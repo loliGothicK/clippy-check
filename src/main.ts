@@ -34,7 +34,7 @@ export async function run(actionInput: input.Input): Promise<Result<void, string
     let stdErr = '';
     let clippyExitCode = 0;
     try {
-        core.startGroup('Executing cargo fmt (JSON output)');
+        core.startGroup('Executing cargo clippy (JSON output)');
         const execOutput = await exec.getExecOutput(
             'cargo',
             [
@@ -99,8 +99,7 @@ export async function run(actionInput: input.Input): Promise<Result<void, string
 
 async function main(): Promise<void> {
     const actionInput = input.get();
-    const res = await run(actionInput);
-    if (res.type === 'failure') core.setFailed(`${res.unwrap_err()}`);
+    (await run(actionInput)).map_err((e: string) => core.setFailed(`${e}`));
 }
 
 main();
