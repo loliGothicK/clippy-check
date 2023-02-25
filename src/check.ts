@@ -1,12 +1,12 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
+import { outdent as indoc } from 'outdent';
 import { plural } from './render';
 
 import pkg from '../package.json';
+import { AnnotationLevel, Conclusion, OutputAnnotations } from './types';
 
 const USER_AGENT = `${pkg.name}/${pkg.version} (${pkg.bugs.url})`;
-
-type ChecksCreateParamsOutputAnnotations = any;
 
 interface CargoMessage {
     reason: string;
@@ -48,10 +48,11 @@ interface Stats {
     warning: number;
     note: number;
     help: number;
+    [key: string]: number;
 }
 
 export class CheckRunner {
-    private annotations: ChecksCreateParamsOutputAnnotations[];
+    private annotations: OutputAnnotations[];
     private stats: Stats;
 
     constructor() {
@@ -108,10 +109,12 @@ export class CheckRunner {
     }
 
     async executeCheck(options: CheckOptions): Promise<void> {
-        core.info(`Clippy results: \
-${this.stats.ice} ICE, ${this.stats.error} errors, \
-${this.stats.warning} warnings, ${this.stats.note} notes, \
-${this.stats.help} help`);
+        core.info(indoc`
+            Clippy results:
+            ${this.stats.ice} ICE, ${this.stats.error} errors,
+            ${this.stats.warning} warnings, ${this.stats.note} notes,
+            ${this.stats.help} help
+        `);
 
         // TODO: Retries
         // TODO: Throttling
@@ -127,9 +130,11 @@ ${this.stats.help} help`);
             if (process.env.GITHUB_HEAD_REF) {
                 core.error(`Unable to create clippy annotations! Reason: ${error}`);
                 core.warning('It seems that this Action is executed from the forked repository.');
-                core.warning(`GitHub Actions are not allowed to create Check annotations, \
-when executed for a forked repos. \
-See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
+                core.warning(indoc`
+                    GitHub Actions are not allowed to create Check annotations,
+                    when executed for a forked repos.
+                    See https://github.com/actions-rs/clippy-check/issues/2 for details.
+                `);
                 core.info('Posting clippy checks here instead.');
 
                 this.dumpToStdout();
@@ -279,9 +284,8 @@ See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
         }
     }
 
-    private getBucket(): ChecksCreateParamsOutputAnnotations[] {
-        // TODO: Use slice or smth?
-        const annotations: ChecksCreateParamsOutputAnnotations[] = [];
+    private getBucket(): OutputAnnotations[] {
+        const annotations: OutputAnnotations[] = [];
         while (annotations.length < 50) {
             const annotation = this.annotations.pop();
             if (annotation) {
@@ -319,43 +323,36 @@ See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
     }
 
     private getText(context: CheckOptions['context']): string {
-        return `## Results
-| Message level           | Amount                |
-| ----------------------- | --------------------- |
-| Internal compiler error | ${this.stats.ice}     |
-| Error                   | ${this.stats.error}   |
-| Warning                 | ${this.stats.warning} |
-| Note                    | ${this.stats.note}    |
-| Help                    | ${this.stats.help}    |
-## Versions
-* ${context.rustc}
-* ${context.cargo}
-* ${context.clippy}
-`;
+        return indoc`
+            ## Results
+            | Message level           | Amount                |
+            | ----------------------- | --------------------- |
+            | Internal compiler error | ${this.stats.ice}     |
+            | Error                   | ${this.stats.error}   |
+            | Warning                 | ${this.stats.warning} |
+            | Note                    | ${this.stats.note}    |
+            | Help                    | ${this.stats.help}    |
+            ## Versions
+            * ${context.rustc}
+            * ${context.cargo}
+            * ${context.clippy}
+        `;
     }
 
-    private getConclusion(): string {
-        if (this.stats.ice > 0 || this.stats.error > 0) {
-            return 'failure';
-        } else {
-            return 'success';
-        }
+    private getConclusion(): Conclusion {
+        return this.stats.ice + this.stats.error > 0 ? 'failure' : 'success';
     }
 
     private isSuccessCheck(): boolean {
-        return (
-            this.stats.ice === 0 &&
-            this.stats.error === 0 &&
-            this.stats.warning === 0 &&
-            this.stats.note === 0 &&
-            this.stats.help === 0
-        );
+        return Object.values(this.stats)
+            .map(item => item !== 0)
+            .includes(true);
     }
 
     /// Convert parsed JSON line into the GH annotation object
     ///
     /// https://developer.github.com/v3/checks/runs/#annotations-object
-    static makeAnnotation(contents: CargoMessage): ChecksCreateParamsOutputAnnotations {
+    static makeAnnotation(contents: CargoMessage): OutputAnnotations {
         const primarySpan: undefined | DiagnosticSpan = contents.message.spans.find(
             span => span.is_primary === true,
         );
@@ -364,7 +361,7 @@ See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
             throw new Error('Unable to find primary span for message');
         }
 
-        let annotation_level: ChecksCreateParamsOutputAnnotations['annotation_level'];
+        let annotation_level: AnnotationLevel;
         // notice, warning, or failure.
         switch (contents.message.level) {
             case 'help':
@@ -379,21 +376,22 @@ See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
                 break;
         }
 
-        const annotation: ChecksCreateParamsOutputAnnotations = {
+        const annotation = {
             path: primarySpan.file_name,
             start_line: primarySpan.line_start,
             end_line: primarySpan.line_end,
             annotation_level,
             title: contents.message.message,
             message: contents.message.rendered,
-        };
+        } satisfies OutputAnnotations;
 
         // Omit these parameters if `start_line` and `end_line` have different values.
-        if (primarySpan.line_start === primarySpan.line_end) {
-            annotation.start_column = primarySpan.column_start;
-            annotation.end_column = primarySpan.column_end;
-        }
-
-        return annotation;
+        return primarySpan.line_start !== primarySpan.line_end
+            ? annotation
+            : Object.assign(
+                  annotation,
+                  { start_column: primarySpan.column_start },
+                  { end_column: primarySpan.column_end },
+              );
     }
 }
