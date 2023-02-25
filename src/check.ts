@@ -4,10 +4,9 @@ import { outdent as indoc } from 'outdent';
 import { plural } from './render';
 
 import pkg from '../package.json';
+import { AnnotationLevel, Conclusion, OutputAnnotations } from './types';
 
 const USER_AGENT = `${pkg.name}/${pkg.version} (${pkg.bugs.url})`;
-
-type ChecksCreateParamsOutputAnnotations = any;
 
 interface CargoMessage {
     reason: string;
@@ -49,10 +48,11 @@ interface Stats {
     warning: number;
     note: number;
     help: number;
+    [key: string]: number;
 }
 
 export class CheckRunner {
-    private annotations: ChecksCreateParamsOutputAnnotations[];
+    private annotations: OutputAnnotations[];
     private stats: Stats;
 
     constructor() {
@@ -284,9 +284,8 @@ export class CheckRunner {
         }
     }
 
-    private getBucket(): ChecksCreateParamsOutputAnnotations[] {
-        // TODO: Use slice or smth?
-        const annotations: ChecksCreateParamsOutputAnnotations[] = [];
+    private getBucket(): OutputAnnotations[] {
+        const annotations: OutputAnnotations[] = [];
         while (annotations.length < 50) {
             const annotation = this.annotations.pop();
             if (annotation) {
@@ -340,28 +339,20 @@ export class CheckRunner {
         `;
     }
 
-    private getConclusion(): string {
-        if (this.stats.ice > 0 || this.stats.error > 0) {
-            return 'failure';
-        } else {
-            return 'success';
-        }
+    private getConclusion(): Conclusion {
+        return this.stats.ice + this.stats.error > 0 ? 'failure' : 'success';
     }
 
     private isSuccessCheck(): boolean {
-        return (
-            this.stats.ice === 0 &&
-            this.stats.error === 0 &&
-            this.stats.warning === 0 &&
-            this.stats.note === 0 &&
-            this.stats.help === 0
-        );
+        return Object.values(this.stats)
+            .map(item => item !== 0)
+            .includes(true);
     }
 
     /// Convert parsed JSON line into the GH annotation object
     ///
     /// https://developer.github.com/v3/checks/runs/#annotations-object
-    static makeAnnotation(contents: CargoMessage): ChecksCreateParamsOutputAnnotations {
+    static makeAnnotation(contents: CargoMessage): OutputAnnotations {
         const primarySpan: undefined | DiagnosticSpan = contents.message.spans.find(
             span => span.is_primary === true,
         );
@@ -370,7 +361,7 @@ export class CheckRunner {
             throw new Error('Unable to find primary span for message');
         }
 
-        let annotation_level: ChecksCreateParamsOutputAnnotations['annotation_level'];
+        let annotation_level: AnnotationLevel;
         // notice, warning, or failure.
         switch (contents.message.level) {
             case 'help':
@@ -385,21 +376,22 @@ export class CheckRunner {
                 break;
         }
 
-        const annotation: ChecksCreateParamsOutputAnnotations = {
+        const annotation = {
             path: primarySpan.file_name,
             start_line: primarySpan.line_start,
             end_line: primarySpan.line_end,
             annotation_level,
             title: contents.message.message,
             message: contents.message.rendered,
-        };
+        } satisfies OutputAnnotations;
 
         // Omit these parameters if `start_line` and `end_line` have different values.
-        if (primarySpan.line_start === primarySpan.line_end) {
-            annotation.start_column = primarySpan.column_start;
-            annotation.end_column = primarySpan.column_end;
-        }
-
-        return annotation;
+        return primarySpan.line_start !== primarySpan.line_end
+            ? annotation
+            : Object.assign(
+                  annotation,
+                  { start_column: primarySpan.column_start },
+                  { end_column: primarySpan.column_end },
+              );
     }
 }
