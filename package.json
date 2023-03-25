@@ -2,7 +2,7 @@
   "name": "clippy-check",
   "version": "0.2.4",
   "description": "\"GitHub Action for PR annotations with clippy checks\"",
-  "main": "lib/main.js",
+  "main": "lib/src/main.js",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write '**/*.ts'",
@@ -52,6 +52,7 @@
     "string-argv": "^0.3.1"
   },
   "volta": {
-    "node": "18.15.0"
+    "node": "18.15.0",
+    "yarn": "3.5.0"
   }
 }
