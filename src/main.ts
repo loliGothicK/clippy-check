@@ -34,7 +34,7 @@ export async function run(actionInput: input.Input): Promise<Result<void, string
     let stdErr = '';
     let clippyExitCode = 0;
     try {
-        core.startGroup('Executing cargo fmt (JSON output)');
+        core.startGroup('Executing cargo clippy (JSON output)');
         const execOutput = await exec.getExecOutput(
             'cargo',
             [
