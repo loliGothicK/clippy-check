@@ -25,5 +25,7 @@
         "suppressImplicitAnyIndexErrors": false,
         "target": "es2021"
     },
-    "include": ["src/**/*"]
+    "include": [
+        "src/**/*"
+    ],
 }

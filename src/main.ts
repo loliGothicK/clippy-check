@@ -89,13 +89,8 @@ export async function run(actionInput: input.Input): Promise<Result<void, string
 }
 
 async function main(): Promise<void> {
-    try {
-        const actionInput = input.get();
-        const res = await run(actionInput);
-        res.expect(e => `${e}`);
-    } catch (error) {
-        core.setFailed(`${error}`);
-    }
+    const actionInput = input.get();
+    (await run(actionInput)).map_err((e: string) => core.setFailed(`${e}`));
 }
 
 main();
