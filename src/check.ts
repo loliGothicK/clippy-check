@@ -52,7 +52,7 @@ interface Stats {
 }
 
 export class CheckRunner {
-    private readonly annotations: OutputAnnotations[];
+    private annotations: OutputAnnotations[];
     private stats: Stats;
 
     constructor() {
@@ -354,7 +354,7 @@ export class CheckRunner {
     /// https://developer.github.com/v3/checks/runs/#annotations-object
     static makeAnnotation(contents: CargoMessage): OutputAnnotations {
         const primarySpan: undefined | DiagnosticSpan = contents.message.spans.find(
-            span => span.is_primary,
+            span => span.is_primary === true,
         );
         // TODO: Handle it properly
         if (null == primarySpan) {
