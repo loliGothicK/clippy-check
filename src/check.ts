@@ -1,14 +1,12 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { plural } from './render';
-import { AnnotationLevel, OutputAnnotations, Conclusion } from './types';
+import { AnnotationLevel, OutputAnnotations, Conclusion, RequestData } from './types';
 import { outdent as indoc } from 'outdent';
 
 import pkg from '../package.json';
 
 const USER_AGENT = `${pkg.name}/${pkg.version} (${pkg.bugs.url})`;
-
-type ChecksCreateParamsOutputAnnotations = any;
 
 interface CargoMessage {
     reason: string;
@@ -187,7 +185,7 @@ ${this.stats.help} help`);
         let annotations = this.getBucket();
         while (annotations.length > 0) {
             // Request data is mostly the same for create/update calls
-            const req: any = {
+            const req: RequestData = {
                 owner: options.owner,
                 repo: options.repo,
                 name: options.name,
@@ -229,7 +227,7 @@ ${this.stats.help} help`);
         checkRunId: number,
         options: CheckOptions,
     ): Promise<void> {
-        const req: any = {
+        const req: RequestData = {
             owner: options.owner,
             repo: options.repo,
             name: options.name,
@@ -256,7 +254,7 @@ ${this.stats.help} help`);
         checkRunId: number,
         options: CheckOptions,
     ): Promise<void> {
-        const req: any = {
+        const req = {
             owner: options.owner,
             repo: options.repo,
             name: options.name,
@@ -269,7 +267,7 @@ ${this.stats.help} help`);
                 summary: 'Unhandled error',
                 text: 'Check was cancelled due to unhandled error. Check the Action logs for details.',
             },
-        };
+        } satisfies RequestData;
 
         // TODO: Check for errors
         await client.rest.checks.update(req);
@@ -283,9 +281,9 @@ ${this.stats.help} help`);
         }
     }
 
-    private getBucket(): ChecksCreateParamsOutputAnnotations[] {
+    private getBucket(): OutputAnnotations[] {
         // TODO: Use slice or smth?
-        const annotations: ChecksCreateParamsOutputAnnotations[] = [];
+        const annotations: OutputAnnotations[] = [];
         while (annotations.length < 50) {
             const annotation = this.annotations.pop();
             if (annotation) {

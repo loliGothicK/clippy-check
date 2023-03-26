@@ -5,8 +5,8 @@
     "main": "lib/src/main.js",
     "scripts": {
         "build": "tsc",
-        "format": "prettier --check --ignore-path .gitignore ./**/*.{js,jsx,ts,tsx,json,css}",
-        "format:fix": "prettier --write --ignore-path .gitignore ./**/*.{js,jsx,ts,tsx,json,css}",
+        "format": "prettier --check --ignore-path .gitignore ./**/*.ts",
+        "format:fix": "prettier --write --ignore-path .gitignore ./**/*.ts",
         "lint": "eslint src/**/*.ts",
         "lint:fix": "eslint --fix src/**/*.ts",
         "pack": "ncc build --source-map --license LICENSE",
