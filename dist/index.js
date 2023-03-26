@@ -273,11 +273,9 @@ ${this.stats.help} help`);
         return this.stats.ice + this.stats.error > 0 ? 'failure' : 'success';
     }
     isSuccessCheck() {
-        return (this.stats.ice === 0 &&
-            this.stats.error === 0 &&
-            this.stats.warning === 0 &&
-            this.stats.note === 0 &&
-            this.stats.help === 0);
+        return !Object.values(this.stats)
+            .map(stat => stat !== 0)
+            .includes(true);
     }
     static makeAnnotation(contents) {
         const primarySpan = contents.message.spans.find(span => span.is_primary);

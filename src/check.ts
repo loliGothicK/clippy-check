@@ -347,13 +347,9 @@ ${this.stats.help} help`);
     }
 
     private isSuccessCheck(): boolean {
-        return (
-            this.stats.ice === 0 &&
-            this.stats.error === 0 &&
-            this.stats.warning === 0 &&
-            this.stats.note === 0 &&
-            this.stats.help === 0
-        );
+        return !Object.values(this.stats)
+            .map(stat => stat !== 0)
+            .includes(true);
     }
 
     /// Convert parsed JSON line into the GH annotation object
