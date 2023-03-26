@@ -270,12 +270,7 @@ ${this.stats.help} help`);
         `;
     }
     getConclusion() {
-        if (this.stats.ice > 0 || this.stats.error > 0) {
-            return 'failure';
-        }
-        else {
-            return 'success';
-        }
+        return this.stats.ice + this.stats.error > 0 ? 'failure' : 'success';
     }
     isSuccessCheck() {
         return (this.stats.ice === 0 &&
@@ -285,7 +280,7 @@ ${this.stats.help} help`);
             this.stats.help === 0);
     }
     static makeAnnotation(contents) {
-        const primarySpan = contents.message.spans.find(span => span.is_primary === true);
+        const primarySpan = contents.message.spans.find(span => span.is_primary);
         if (null == primarySpan) {
             throw new Error('Unable to find primary span for message');
         }
@@ -310,11 +305,9 @@ ${this.stats.help} help`);
             title: contents.message.message,
             message: contents.message.rendered,
         };
-        if (primarySpan.line_start === primarySpan.line_end) {
-            annotation.start_column = primarySpan.column_start;
-            annotation.end_column = primarySpan.column_end;
-        }
-        return annotation;
+        return primarySpan.line_start !== primarySpan.line_end
+            ? annotation
+            : Object.assign(annotation, { start_column: primarySpan.column_start }, { end_column: primarySpan.column_end });
     }
 }
 exports.CheckRunner = CheckRunner;
