@@ -131,8 +131,7 @@ ${this.stats.help} help`);
                 core.warning(indoc`
                   GitHub Actions are not allowed to create Check annotations,
                   when executed for a forked repos.
-                  See https://github.com/actions-rs/clippy-check/issues/2 for details.`
-                );
+                  See https://github.com/actions-rs/clippy-check/issues/2 for details.`);
                 core.info('Posting clippy checks here instead.');
 
                 this.dumpToStdout();
