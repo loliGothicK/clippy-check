@@ -83,15 +83,6 @@ export async function run(actionInput: input.Input): Promise<Result<void, string
     });
 
     if (clippyExitCode !== 0) {
-        if (
-            stdErr
-                .split('\n')
-                .map(line => line.startsWith('error: internal compiler error'))
-                .reduce((acc, ice) => acc || ice, false)
-        ) {
-            core.setOutput('Suppress ICEs', stdErr);
-            return new Ok(undefined);
-        }
         return new Err(`Clippy had exited with the ${clippyExitCode} exit code:\n${stdErr}`);
     }
     return new Ok(undefined);
