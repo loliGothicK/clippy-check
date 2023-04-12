@@ -10,6 +10,7 @@ export interface Input {
     deny: string[];
     forbid: string[];
     name: string;
+    workingDirectory: string;
 }
 
 export function get(): Input {
@@ -20,6 +21,7 @@ export function get(): Input {
     const deny = stringArgv(core.getInput('deny', { required: false }));
     const forbid = stringArgv(core.getInput('forbid', { required: false }));
     const name = core.getInput('name', { required: false });
+    const workingDirectory = core.getInput('working-directory', { required: false });
 
     return {
         token,
@@ -29,5 +31,6 @@ export function get(): Input {
         deny,
         forbid,
         name,
+        workingDirectory,
     };
 }

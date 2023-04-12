@@ -29,10 +29,14 @@ export async function run(actionInput: input.Input): Promise<Result<void, string
     const allow = addPrefix('--allow', actionInput.allow);
     const deny = addPrefix('--deny', actionInput.deny);
     const forbid = addPrefix('--forbid', actionInput.forbid);
+    const manifestPath: string = actionInput.workingDirectory.endsWith('/')
+        ? `${actionInput.workingDirectory}Cargo.toml`
+        : `${actionInput.workingDirectory}/Cargo.toml`;
 
     const runner = new CheckRunner();
     let stdErr = '';
     let clippyExitCode = 0;
+
     try {
         core.startGroup('Executing cargo clippy (JSON output)');
         const execOutput = await exec.getExecOutput(
@@ -40,6 +44,7 @@ export async function run(actionInput: input.Input): Promise<Result<void, string
             [
                 'clippy',
                 '--message-format=json',
+                `--manifest-path=${manifestPath}`,
                 ...actionInput.options.filter(opt => !opt.startsWith('--message-format')),
                 '--',
                 ...warn,

@@ -27,6 +27,9 @@ inputs:
   name:
     description: Display name of the created GitHub check. Must be unique across several LoliGothick/clippy-check invocations.
     default: clippy
+  working-directory:
+    description: working directory where to execute `cargo clippy`.
+    default: .
 
 runs:
   using: "node16"
