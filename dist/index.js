@@ -356,6 +356,7 @@ function get() {
     const deny = (0, string_argv_1.default)(core.getInput('deny', { required: false }));
     const forbid = (0, string_argv_1.default)(core.getInput('forbid', { required: false }));
     const name = core.getInput('name', { required: false });
+    const workingDirectory = core.getInput('working-directory', { required: false });
     return {
         token,
         options,
@@ -364,6 +365,7 @@ function get() {
         deny,
         forbid,
         name,
+        workingDirectory,
     };
 }
 exports.get = get;
@@ -426,6 +428,9 @@ async function run(actionInput) {
     const allow = addPrefix('--allow', actionInput.allow);
     const deny = addPrefix('--deny', actionInput.deny);
     const forbid = addPrefix('--forbid', actionInput.forbid);
+    const manifestPath = actionInput.workingDirectory.endsWith('/')
+        ? `${actionInput.workingDirectory}Cargo.toml`
+        : `${actionInput.workingDirectory}/Cargo.toml`;
     const runner = new check_1.CheckRunner();
     let stdErr = '';
     let clippyExitCode = 0;
@@ -434,6 +439,7 @@ async function run(actionInput) {
         const execOutput = await exec.getExecOutput('cargo', [
             'clippy',
             '--message-format=json',
+            `--manifest-path=${manifestPath}`,
             ...actionInput.options.filter(opt => !opt.startsWith('--message-format')),
             '--',
             ...warn,
@@ -12591,7 +12597,7 @@ module.exports = require("zlib");
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"clippy-check","version":"0.2.10","description":"\\"GitHub Action for PR annotations with clippy checks\\"","main":"lib/src/main.js","scripts":{"build":"tsc","format":"prettier --check --ignore-path .gitignore ./**/*.ts","format:fix":"prettier --write --ignore-path .gitignore ./**/*.ts","lint":"eslint src/**/*.ts","lint:fix":"eslint --fix src/**/*.ts","pack":"ncc build --source-map --license LICENSE","test":"jest --runInBand","all":"npm run format:fix && npm run lint:fix && npm run build && npm run pack"},"repository":{"type":"git","url":"git+https://github.com/LoliGothick/clippy-check.git"},"keywords":["actions","rust","cargo"],"author":"Mitama Lab","license":"MIT","bugs":{"url":"https://github.com/LoliGothick/clippy-check/issues"},"homepage":"https://github.com/LoliGothick/clippy-check#readme","devDependencies":{"@types/core-js":"2.5.5","@types/node":"18.15.9","@typescript-eslint/eslint-plugin":"^5.53.0","@typescript-eslint/parser":"5.56.0","@vercel/ncc":"0.36.1","eslint":"^8.34.0","eslint-config-prettier":"8.8.0","eslint-config-standard-with-typescript":"^34.0.0","eslint-plugin-github":"^4.6.1","eslint-plugin-import":"^2.27.5","eslint-plugin-jest":"^27.2.1","eslint-plugin-n":"^15.6.1","eslint-plugin-promise":"^6.1.1","prettier":"2.8.7","typescript":"^5.0.0"},"dependencies":{"@actions/core":"^1.4.0","@actions/exec":"^1.1.0","@actions/github":"^5.0.0","outdent":"^0.8.0","string-argv":"^0.3.1"},"volta":{"node":"18.15.0","yarn":"3.5.0"}}');
+module.exports = JSON.parse('{"name":"clippy-check","version":"0.2.11","description":"\\"GitHub Action for PR annotations with clippy checks\\"","main":"lib/src/main.js","scripts":{"build":"tsc","format":"prettier --check --ignore-path .gitignore ./**/*.ts","format:fix":"prettier --write --ignore-path .gitignore ./**/*.ts","lint":"eslint src/**/*.ts","lint:fix":"eslint --fix src/**/*.ts","pack":"ncc build --source-map --license LICENSE","test":"jest --runInBand","all":"npm run format:fix && npm run lint:fix && npm run build && npm run pack"},"repository":{"type":"git","url":"git+https://github.com/LoliGothick/clippy-check.git"},"keywords":["actions","rust","cargo"],"author":"Mitama Lab","license":"MIT","bugs":{"url":"https://github.com/LoliGothick/clippy-check/issues"},"homepage":"https://github.com/LoliGothick/clippy-check#readme","devDependencies":{"@types/core-js":"2.5.5","@types/node":"18.15.11","@typescript-eslint/eslint-plugin":"^5.53.0","@typescript-eslint/parser":"5.57.0","@vercel/ncc":"0.36.1","eslint":"^8.34.0","eslint-config-prettier":"8.8.0","eslint-config-standard-with-typescript":"^34.0.0","eslint-plugin-github":"^4.6.1","eslint-plugin-import":"^2.27.5","eslint-plugin-jest":"^27.2.1","eslint-plugin-n":"^15.6.1","eslint-plugin-promise":"^6.1.1","prettier":"2.8.7","typescript":"^5.0.0"},"dependencies":{"@actions/core":"^1.4.0","@actions/exec":"^1.1.0","@actions/github":"^5.0.0","outdent":"^0.8.0","string-argv":"^0.3.1"},"volta":{"node":"18.15.0","yarn":"3.5.0"}}');
 
 /***/ }),
 
