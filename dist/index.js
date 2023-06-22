@@ -346,10 +346,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.get = void 0;
-const string_argv_1 = __importDefault(__nccwpck_require__(9453));
+const string_argv_1 = __importDefault(__nccwpck_require__(9663));
 const core = __importStar(__nccwpck_require__(2186));
 function get() {
     const token = core.getInput('token', { required: true });
+    const toolchain = core.getInput('toolchain', { required: false });
+    const target = core.getInput('target', { required: false });
     const options = (0, string_argv_1.default)(core.getInput('options', { required: false }));
     const warn = (0, string_argv_1.default)(core.getInput('warn', { required: false }));
     const allow = (0, string_argv_1.default)(core.getInput('allow', { required: false }));
@@ -359,6 +361,8 @@ function get() {
     const workingDirectory = core.getInput('working-directory', { required: false });
     return {
         token,
+        toolchain,
+        target: target === '' ? undefined : target,
         options,
         warn,
         allow,
@@ -409,9 +413,9 @@ const github = __importStar(__nccwpck_require__(5438));
 const input = __importStar(__nccwpck_require__(1044));
 const check_1 = __nccwpck_require__(9877);
 const result_1 = __nccwpck_require__(4801);
-async function getVersion(cmd, args) {
-    args = args === undefined ? ['-V'] : [...args, '-V'];
-    return (await exec.getExecOutput(cmd, args, { silent: true })).stdout;
+async function getVersion(cmd, toolchain) {
+    return (await exec.getExecOutput('rustup', ['run', toolchain, cmd, '-V'], { silent: true }))
+        .stdout;
 }
 function addPrefix(prefix, options) {
     return options.flatMap(opt => [
@@ -421,9 +425,10 @@ function addPrefix(prefix, options) {
 }
 async function run(actionInput) {
     const startedAt = new Date().toISOString();
-    const rustcVersion = await getVersion('rustc');
-    const cargoVersion = await getVersion('cargo');
-    const clippyVersion = await getVersion('cargo', ['clippy']);
+    const rustcVersion = await getVersion('rustc', actionInput.toolchain);
+    const cargoVersion = await getVersion('cargo', actionInput.toolchain);
+    const clippyVersion = await getVersion('cargo', actionInput.toolchain);
+    const target = actionInput.target === undefined ? [] : ['-t', actionInput.target];
     const warn = addPrefix('--warn', actionInput.warn);
     const allow = addPrefix('--allow', actionInput.allow);
     const deny = addPrefix('--deny', actionInput.deny);
@@ -441,6 +446,7 @@ async function run(actionInput) {
             '--message-format=json',
             `--manifest-path=${manifestPath}`,
             ...actionInput.options.filter(opt => !opt.startsWith('--message-format')),
+            ...target,
             '--',
             ...warn,
             ...allow,
@@ -9235,58 +9241,6 @@ if (true) {
 
 /***/ }),
 
-/***/ 9453:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-exports.__esModule = true;
-function parseArgsStringToArgv(value, env, file) {
-    // ([^\s'"]([^\s'"]*(['"])([^\3]*?)\3)+[^\s'"]*) Matches nested quotes until the first space outside of quotes
-    // [^\s'"]+ or Match if not a space ' or "
-    // (['"])([^\5]*?)\5 or Match "quoted text" without quotes
-    // `\3` and `\5` are a backreference to the quote style (' or ") captured
-    var myRegexp = /([^\s'"]([^\s'"]*(['"])([^\3]*?)\3)+[^\s'"]*)|[^\s'"]+|(['"])([^\5]*?)\5/gi;
-    var myString = value;
-    var myArray = [];
-    if (env) {
-        myArray.push(env);
-    }
-    if (file) {
-        myArray.push(file);
-    }
-    var match;
-    do {
-        // Each call to exec returns the next regex match as an array
-        match = myRegexp.exec(myString);
-        if (match !== null) {
-            // Index 1 in the array is the captured group if it exists
-            // Index 0 is the matched text, which we use if no captured group exists
-            myArray.push(firstString(match[1], match[6], match[0]));
-        }
-    } while (match !== null);
-    return myArray;
-}
-exports["default"] = parseArgsStringToArgv;
-exports.parseArgsStringToArgv = parseArgsStringToArgv;
-// Accepts any number of arguments, and returns the first one that is a string
-// (even an empty string)
-function firstString() {
-    var args = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
-    }
-    for (var i = 0; i < args.length; i++) {
-        var arg = args[i];
-        if (typeof arg === "string") {
-            return arg;
-        }
-    }
-}
-
-
-/***/ }),
-
 /***/ 4256:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -12593,11 +12547,64 @@ module.exports = require("zlib");
 
 /***/ }),
 
+/***/ 9663:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+exports.__esModule = true;
+exports.parseArgsStringToArgv = void 0;
+function parseArgsStringToArgv(value, env, file) {
+    // ([^\s'"]([^\s'"]*(['"])([^\3]*?)\3)+[^\s'"]*) Matches nested quotes until the first space outside of quotes
+    // [^\s'"]+ or Match if not a space ' or "
+    // (['"])([^\5]*?)\5 or Match "quoted text" without quotes
+    // `\3` and `\5` are a backreference to the quote style (' or ") captured
+    var myRegexp = /([^\s'"]([^\s'"]*(['"])([^\3]*?)\3)+[^\s'"]*)|[^\s'"]+|(['"])([^\5]*?)\5/gi;
+    var myString = value;
+    var myArray = [];
+    if (env) {
+        myArray.push(env);
+    }
+    if (file) {
+        myArray.push(file);
+    }
+    var match;
+    do {
+        // Each call to exec returns the next regex match as an array
+        match = myRegexp.exec(myString);
+        if (match !== null) {
+            // Index 1 in the array is the captured group if it exists
+            // Index 0 is the matched text, which we use if no captured group exists
+            myArray.push(firstString(match[1], match[6], match[0]));
+        }
+    } while (match !== null);
+    return myArray;
+}
+exports["default"] = parseArgsStringToArgv;
+exports.parseArgsStringToArgv = parseArgsStringToArgv;
+// Accepts any number of arguments, and returns the first one that is a string
+// (even an empty string)
+function firstString() {
+    var args = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i] = arguments[_i];
+    }
+    for (var i = 0; i < args.length; i++) {
+        var arg = args[i];
+        if (typeof arg === "string") {
+            return arg;
+        }
+    }
+}
+
+
+/***/ }),
+
 /***/ 2876:
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"clippy-check","version":"0.2.11","description":"\\"GitHub Action for PR annotations with clippy checks\\"","main":"lib/src/main.js","scripts":{"build":"tsc","format":"prettier --check --ignore-path .gitignore ./**/*.ts","format:fix":"prettier --write --ignore-path .gitignore ./**/*.ts","lint":"eslint src/**/*.ts","lint:fix":"eslint --fix src/**/*.ts","pack":"ncc build --source-map --license LICENSE","test":"jest --runInBand","all":"npm run format:fix && npm run lint:fix && npm run build && npm run pack"},"repository":{"type":"git","url":"git+https://github.com/LoliGothick/clippy-check.git"},"keywords":["actions","rust","cargo"],"author":"Mitama Lab","license":"MIT","bugs":{"url":"https://github.com/LoliGothick/clippy-check/issues"},"homepage":"https://github.com/LoliGothick/clippy-check#readme","devDependencies":{"@types/core-js":"2.5.5","@types/node":"18.15.11","@typescript-eslint/eslint-plugin":"^5.53.0","@typescript-eslint/parser":"5.57.0","@vercel/ncc":"0.36.1","eslint":"^8.34.0","eslint-config-prettier":"8.8.0","eslint-config-standard-with-typescript":"^34.0.0","eslint-plugin-github":"^4.6.1","eslint-plugin-import":"^2.27.5","eslint-plugin-jest":"^27.2.1","eslint-plugin-n":"^15.6.1","eslint-plugin-promise":"^6.1.1","prettier":"2.8.7","typescript":"^5.0.0"},"dependencies":{"@actions/core":"^1.4.0","@actions/exec":"^1.1.0","@actions/github":"^5.0.0","outdent":"^0.8.0","string-argv":"^0.3.1"},"volta":{"node":"18.15.0","yarn":"3.5.0"}}');
+module.exports = JSON.parse('{"name":"clippy-check","version":"0.3.0","description":"\\"GitHub Action for PR annotations with clippy checks\\"","main":"lib/src/main.js","scripts":{"build":"tsc","format":"prettier --check --ignore-path .gitignore ./**/*.ts","format:fix":"prettier --write --ignore-path .gitignore ./**/*.ts","lint":"eslint src/**/*.ts","lint:fix":"eslint --fix src/**/*.ts","pack":"ncc build --source-map --license LICENSE","test":"jest --runInBand","all":"npm run format:fix && npm run lint:fix && npm run build && npm run pack"},"repository":{"type":"git","url":"git+https://github.com/LoliGothick/clippy-check.git"},"keywords":["actions","rust","cargo"],"author":"Mitama Lab","license":"MIT","bugs":{"url":"https://github.com/LoliGothick/clippy-check/issues"},"homepage":"https://github.com/LoliGothick/clippy-check#readme","devDependencies":{"@types/core-js":"2.5.5","@types/node":"18.16.17","@typescript-eslint/eslint-plugin":"^5.53.0","@typescript-eslint/parser":"5.59.9","@vercel/ncc":"0.36.1","eslint":"^8.34.0","eslint-config-prettier":"8.8.0","eslint-config-standard-with-typescript":"^35.0.0","eslint-plugin-github":"^4.6.1","eslint-plugin-import":"^2.27.5","eslint-plugin-jest":"^27.2.1","eslint-plugin-n":"^15.6.1","eslint-plugin-promise":"^6.1.1","prettier":"2.8.8","typescript":"^5.0.0"},"dependencies":{"@actions/core":"^1.4.0","@actions/exec":"^1.1.0","@actions/github":"^5.0.0","outdent":"^0.8.0","string-argv":"^0.3.1"},"volta":{"node":"18.16.0","yarn":"3.6.0"}}');
 
 /***/ }),
 

@@ -4,6 +4,8 @@ import * as core from '@actions/core';
 // Parsed action input
 export interface Input {
     token: string;
+    toolchain: string;
+    target?: string;
     options: string[];
     warn: string[];
     allow: string[];
@@ -15,6 +17,8 @@ export interface Input {
 
 export function get(): Input {
     const token = core.getInput('token', { required: true });
+    const toolchain = core.getInput('toolchain', { required: false });
+    const target = core.getInput('target', { required: false });
     const options = stringArgv(core.getInput('options', { required: false }));
     const warn = stringArgv(core.getInput('warn', { required: false }));
     const allow = stringArgv(core.getInput('allow', { required: false }));
@@ -25,6 +29,8 @@ export function get(): Input {
 
     return {
         token,
+        toolchain,
+        target: target === '' ? undefined : target,
         options,
         warn,
         allow,
