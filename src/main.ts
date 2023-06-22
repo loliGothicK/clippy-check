@@ -23,7 +23,7 @@ export async function run(actionInput: input.Input): Promise<Result<void, string
     const rustcVersion = await getVersion('rustc', actionInput.toolchain);
     const cargoVersion = await getVersion('cargo', actionInput.toolchain);
     const clippyVersion = await getVersion('cargo', actionInput.toolchain);
-    const target = actionInput.target === undefined ? [] : ['-t', actionInput.target];
+    const target = actionInput.target === undefined ? [] : ['--target', actionInput.target];
 
     const warn = addPrefix('--warn', actionInput.warn);
     const allow = addPrefix('--allow', actionInput.allow);
