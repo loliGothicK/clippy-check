@@ -25,8 +25,10 @@ clippy:
 ## Inputs
 
 |       Name        | Required | Description                                                                                                                             |  Type  |         Default         |
-|:-----------------:|:--------:|:----------------------------------------------------------------------------------------------------------------------------------------| :----: | :---------------------: |
+|:-----------------:|:--------:|:----------------------------------------------------------------------------------------------------------------------------------------| :----: |:-----------------------:|
 |       token       |    ✔     | GitHub secret token, usually a `${{ secrets.GITHUB_TOKEN }}`.                                                                           | string |                         |
+|     toolchain     |          | Rust toolchain to use .                                                                                                                 | string |         stable          |
+|      target       |          | Target to run clippy on.                                                                                                                | string |                         |
 |      options      |          | Options for the `cargo calippy` command.<br>`--message-format=json` is set by default.<br>Given `--message-format` is omitted silently. | string | `--message-format=json` |
 |       warn        |          | Sequence for lint warnings (without `clippy::`).                                                                                        | string |                         |
 |       allow       |          | Sequence for lint allowed (without `clippy::`).                                                                                         | string |                         |

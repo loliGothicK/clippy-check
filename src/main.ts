@@ -6,9 +6,9 @@ import * as input from './input';
 import { CheckRunner } from './check';
 import { Err, Ok, Result } from './result';
 
-async function getVersion(cmd: string, args?: string[]): Promise<string> {
-    args = args === undefined ? ['-V'] : [...args, '-V'];
-    return (await exec.getExecOutput(cmd, args, { silent: true })).stdout;
+async function getVersion(cmd: string, toolchain: string): Promise<string> {
+    return (await exec.getExecOutput('rustup', ['run', toolchain, cmd, '-V'], { silent: true }))
+        .stdout;
 }
 
 function addPrefix(prefix: string, options: string[]): string[] {
@@ -20,10 +20,10 @@ function addPrefix(prefix: string, options: string[]): string[] {
 
 export async function run(actionInput: input.Input): Promise<Result<void, string>> {
     const startedAt = new Date().toISOString();
-
-    const rustcVersion = await getVersion('rustc');
-    const cargoVersion = await getVersion('cargo');
-    const clippyVersion = await getVersion('cargo', ['clippy']);
+    const rustcVersion = await getVersion('rustc', actionInput.toolchain);
+    const cargoVersion = await getVersion('cargo', actionInput.toolchain);
+    const clippyVersion = await getVersion('cargo', actionInput.toolchain);
+    const target = actionInput.target === undefined ? [] : ['-t', actionInput.target];
 
     const warn = addPrefix('--warn', actionInput.warn);
     const allow = addPrefix('--allow', actionInput.allow);
@@ -46,6 +46,7 @@ export async function run(actionInput: input.Input): Promise<Result<void, string
                 '--message-format=json',
                 `--manifest-path=${manifestPath}`,
                 ...actionInput.options.filter(opt => !opt.startsWith('--message-format')),
+                ...target,
                 '--',
                 ...warn,
                 ...allow,

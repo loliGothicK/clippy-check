@@ -1,6 +1,6 @@
 {
     "name": "clippy-check",
-    "version": "0.2.11",
+    "version": "0.3.0",
     "description": "\"GitHub Action for PR annotations with clippy checks\"",
     "main": "lib/src/main.js",
     "scripts": {

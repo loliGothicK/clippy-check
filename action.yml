@@ -6,30 +6,36 @@ branding:
   color: blue
 
 inputs:
-  token:
-    description: GitHub token
-    required: true
-  options:
-    description: Arguments for the `cargo clippy` command
-    required: false
-  warn:
-    description: Sequence of lint warnings (without `clippy::` prefix)
-    required: false
-  allow:
-    description: Sequence of lint allowed (without `clippy::` prefix)
-    required: false
-  deny:
-    description: Sequence of lint denied (without `clippy::` prefix)
-    required: false
-  forbid:
-    description: Sequence of lint forbidden (without `clippy::` prefix)
-    required: false
-  name:
-    description: Display name of the created GitHub check. Must be unique across several LoliGothick/clippy-check invocations.
-    default: clippy
-  working-directory:
-    description: working directory where to execute `cargo clippy`.
-    default: .
+    token:
+        description: GitHub token
+        required: true
+    toolchain:
+        description: Rust toolchain to use
+        default: stable
+    target:
+        description: Target to run clippy on
+        required: false
+    options:
+        description: Arguments for the `cargo clippy` command
+        required: false
+    warn:
+        description: Sequence of lint warnings (without `clippy::` prefix)
+        required: false
+    allow:
+        description: Sequence of lint allowed (without `clippy::` prefix)
+        required: false
+    deny:
+        description: Sequence of lint denied (without `clippy::` prefix)
+        required: false
+    forbid:
+        description: Sequence of lint forbidden (without `clippy::` prefix)
+        required: false
+    name:
+        description: Display name of the created GitHub check. Must be unique across several LoliGothick/clippy-check invocations.
+        default: clippy
+    working-directory:
+        description: working directory where to execute `cargo clippy`.
+        default: .
 
 runs:
   using: "node16"

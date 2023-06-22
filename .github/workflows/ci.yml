@@ -4,7 +4,6 @@ on:
   push
 
 jobs:
-  
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -12,5 +11,3 @@ jobs:
       - uses: volta-cli/action@v4
       - run: npm install
       - run: npm run lint
-
-  
