@@ -9,5 +9,5 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: volta-cli/action@v4
-      - run: npm install
-      - run: npm run lint
+      - run: yarn install
+      - run: yarn lint
