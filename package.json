@@ -5,8 +5,8 @@
     "main": "lib/src/main.js",
     "scripts": {
         "build": "tsc",
-        "format": "prettier --check --ignore-path .gitignore ./**/*.ts",
-        "format:fix": "prettier --write --ignore-path .gitignore ./**/*.ts",
+        "format": "prettier --check --ignore-path .gitignore src",
+        "format:fix": "prettier --write --ignore-path .gitignore src",
         "lint": "eslint src/**/*.ts",
         "lint:fix": "eslint --fix src/**/*.ts",
         "pack": "ncc build --source-map --license LICENSE",
@@ -31,8 +31,8 @@
     "devDependencies": {
         "@types/core-js": "2.5.5",
         "@types/node": "18.16.19",
-        "@typescript-eslint/eslint-plugin": "^5.53.0",
-        "@typescript-eslint/parser": "5.62.0",
+        "@typescript-eslint/eslint-plugin": "6.0.0",
+        "@typescript-eslint/parser": "6.1.0",
         "@vercel/ncc": "0.36.1",
         "eslint": "^8.34.0",
         "eslint-config-prettier": "8.8.0",
@@ -42,7 +42,7 @@
         "eslint-plugin-jest": "^27.2.1",
         "eslint-plugin-n": "^16.0.0",
         "eslint-plugin-promise": "^6.1.1",
-        "prettier": "2.8.8",
+        "prettier": "3.0.0",
         "typescript": "^5.0.0"
     },
     "dependencies": {
@@ -55,5 +55,6 @@
     "volta": {
         "node": "18.17.0",
         "yarn": "3.6.1"
-    }
+    },
+    "packageManager": "yarn@3.6.1"
 }
