@@ -371,10 +371,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:18.18.0":
-  version: 18.18.0
-  resolution: "@types/node@npm:18.18.0"
-  checksum: 61bcffa28eb713e7a4c66fd369df603369c3f834a783faeced95fe3e78903faa25f1a704d49e054f41d71b7915eeb066d10a37cc699421fcf5dd267f96ad5808
+"@types/node@npm:18.18.13":
+  version: 18.18.13
+  resolution: "@types/node@npm:18.18.13"
+  dependencies:
+    undici-types: ~5.26.4
+  checksum: e36d7a0ea6ce8fb771fd84dc2412935408448c1fed098205d3103be661852fc40d22a987e6c6c926a20719a15266e3071c8d4fd2548a96ad6c3c74eb474b5e63
   languageName: node
   linkType: hard
 
@@ -1181,7 +1183,7 @@ __metadata:
     "@actions/exec": 1.1.1
     "@actions/github": 6.0.0
     "@types/core-js": 2.5.8
-    "@types/node": 18.18.0
+    "@types/node": 18.18.13
     "@typescript-eslint/eslint-plugin": 6.7.3
     "@typescript-eslint/parser": 6.7.3
     "@vercel/ncc": 0.38.1
@@ -4085,6 +4087,13 @@ __metadata:
     has-symbols: ^1.0.3
     which-boxed-primitive: ^1.0.2
   checksum: b7a1cf5862b5e4b5deb091672ffa579aa274f648410009c81cca63fed3b62b610c4f3b773f912ce545bb4e31edc3138975b5bc777fc6e4817dca51affb6380e9
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~5.26.4":
+  version: 5.26.5
+  resolution: "undici-types@npm:5.26.5"
+  checksum: 3192ef6f3fd5df652f2dc1cd782b49d6ff14dc98e5dced492aa8a8c65425227da5da6aafe22523c67f035a272c599bb89cfe803c1db6311e44bed3042fc25487
   languageName: node
   linkType: hard
 
