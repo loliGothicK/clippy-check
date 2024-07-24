@@ -43,7 +43,7 @@
         "string-argv": "0.3.2"
     },
     "volta": {
-        "node": "20.15.1",
+        "node": "20.16.0",
         "yarn": "1.22.22"
     },
     "packageManager": "yarn@1.22.22"
