@@ -33,7 +33,7 @@
         "@types/core-js": "2.5.8",
         "@types/node": "24.12.2",
         "@vercel/ncc": "0.38.4",
-        "typescript": "6.0.2"
+        "typescript": "6.0.3"
     },
     "dependencies": {
         "@actions/core": "3.0.0",
